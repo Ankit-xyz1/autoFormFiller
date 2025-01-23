@@ -24,7 +24,7 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
         try {
             // Open the Google Form
-            await page.goto('https://forms.gle/ujo8am9GdFCZGVsz9', { waitUntil: 'domcontentloaded' });
+            await page.goto('YourLink', { waitUntil: 'domcontentloaded' });
 
             // Wait for the "Name" input field to be visible and interactable
             await page.waitForSelector('input[type="text"]', { visible: true });
