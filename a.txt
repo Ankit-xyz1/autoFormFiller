@@ -1,0 +1,39 @@
+const puppeteer = require('puppeteer');
+
+// Function to add a delay
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+(async () => {
+    const names = ["Shivansh", "Manav", "Rohan", "Raj", "Vansh", "Dhruv", "Aryan", "Shaurya", "Kabir", "Saanvi"]; // Array of names
+
+    for (let i = 0; i < 5; i++) {
+        const randomName = names[Math.floor(Math.random() * names.length)]; // Pick random name
+
+        const browser = await puppeteer.launch({ headless: false }); // Set headless: true for no UI
+        const page = await browser.newPage();
+
+        // Open the Google Form
+        await page.goto('https://forms.gle/ujo8am9GdFCZGVsz9');
+
+        // 1. Fill in the "Name" field
+        await page.type('input[type="text"]', randomName); // Adjust selector if needed
+
+        // 2. Dynamically handle all multiple-choice questions
+        const allQuestions = await page.$$('div[role="radiogroup"]'); // Select all multiple-choice questions
+        for (let i = 0; i < allQuestions.length; i++) {
+            const options = await allQuestions[i].$$('div[role="radio"]'); // Get options for the current question
+            const randomOption = Math.floor(Math.random() * options.length); // Pick a random option
+            await options[randomOption].click(); // Click the random option
+        }
+
+        // 3. Submit the form
+        await page.click('div[role="button"][aria-label="Submit"]');
+
+        // Wait for confirmation page or delay for processing
+        console.log(`Form submitted with name: ${randomName}`);
+
+        // Close the browser after 3 seconds (to mimic human behavior)
+        await delay(5000); // Wait for 5 seconds before the next iteration
+        await browser.close(); // Close the browser after the delay
+    }
+})();

@@ -1,0 +1,61 @@
+const puppeteer = require('puppeteer');
+
+// Function to add a delay
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+(async () => {
+    const names = ["Ananya", "Isha", "Aditi", "Diya", "Madhavi", "Priya", "Neha", "Kavya", "Sneha", "Simran",
+    "Shivani", "Ritika", "Nikita", "Kiran", "Shreya", "Meera", "Alisha", "Tanya", "Radhika", "Shruti",
+    "Pooja", "Sanya", "Navya", "Kajal", "Manju", "Anjali", "Aishwarya", "Shubhi", "Aarohi", "Siddhi",
+    "Lavanya", "Srishti", "Aaradhya", "Naina", "Riya", "Sonal", "Tanvi", "Bhuvi", "Pari", "Sonali",
+    "Anvita", "Bhavya", "Shalini", "Ayesha", "Kajal", "Kriti", "Kanika", "Khushboo", "Mansi", "Meenal",
+    "Nandini", "Suman", "Kanchan", "Kumari", "Kavitha", "Sundari", "Shweta", "Aarushi", "Manju", "Gargi",
+    "Poojan", "Rupal", "Hina", "Nisha", "Hema", "Yashika", "Madhuri", "Komal", "Shivendra", "Vishal",
+    "Tushar", "Sanjay", "Rajesh", "Ravi", "Amit", "Vikas", "Vijay", "Anil", "Sandeep", "Manoj",
+    "Ajay", "Suresh", "Sunil", "Ashok", "Prem", "Deepak", "Kumar", "Nitin", "Harish", "Ramesh",
+    "Pankaj", "Pradeep", "Mukesh", "Siddharth", "Arvind", "Ram", "Sujay", "Raghav", "Harsh", "Krish",
+    "Tanmay","Vikrant", "Subhash", "Keshav", "Mukul", "Saurabh", "Rahul", "Akhil", "Basant"]; // Array of names
+
+    for (let i = 0; i < 50; i++) {
+        const randomName = names[Math.floor(Math.random() * names.length)]; // Pick random name
+
+        const browser = await puppeteer.launch({ headless: false }); // Set headless: true for no UI
+        const page = await browser.newPage();
+
+        // Open the Google Form
+        await page.goto('https://forms.gle/ujo8am9GdFCZGVsz9', { waitUntil: 'domcontentloaded' });
+
+        // Wait for the "Name" input field to be visible and interactable
+        await page.waitForSelector('input[type="text"]', { visible: true });
+
+        // 1. Fill in the "Name" field with a random name
+        try { 
+            await delay(1000);
+            await page.type('input[type="text"]', randomName); // Get the name input field element
+            await delay(1000);
+        } catch (error) {
+            console.log(error)
+        }
+ // Type the random name into the input field
+
+        // 2. Dynamically handle all multiple-choice questions
+        const allQuestions = await page.$$('div[role="radiogroup"]'); // Select all multiple-choice questions
+        for (let i = 0; i < allQuestions.length; i++) {
+            const options = await allQuestions[i].$$('div[role="radio"]'); // Get options for the current question
+            const randomOption = Math.floor(Math.random() * options.length); // Pick a random option
+            await options[randomOption].click(); // Click the random option
+        }
+
+        // 3. Wait for submit button to be clickable, then click it
+        const submitButton = await page.$('div[role="button"][aria-label="Submit"]');
+        await page.waitForSelector('div[role="button"][aria-label="Submit"]', { visible: true }); // Wait until the submit button is visible
+        await submitButton.click(); // Click the submit button
+
+        // Wait for 5 seconds before the next iteration
+        console.log(`Form submitted with name: ${randomName}`);
+        await delay(5000); // Wait for 5 seconds before the next iteration
+
+        // Close the browser after the delay
+        await browser.close(); // Close the browser after the delay
+    }
+})();
